@@ -1,31 +1,64 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import RoomCard from '@/components/RoomCard'
 
-export default async function RoomsBoard() {
-  const supabase = createServerSupabaseClient()
+export default function RoomsBoard() {
+  const [rooms, setRooms] = useState<any[]>([])
+  const [occupancies, setOccupancies] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   
-  // First, fetch all rooms
-  const { data: rooms, error: roomsError } = await supabase
-    .from('rooms')
-    .select('*')
-    .order('block', { ascending: true })
-    .order('room_no', { ascending: true })
+  const supabase = createClientComponentClient()
 
-  if (roomsError) {
-    console.error('Error fetching rooms:', roomsError)
-    return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-        <p className="font-medium">Error loading rooms data</p>
-        <p className="text-sm mt-1">Details: {roomsError.message}</p>
-        <p className="text-sm mt-2">
-          Please visit <a href="/setup" className="underline font-medium">Setup Page</a> to initialize the database.
-        </p>
-      </div>
-    )
+  const fetchData = async () => {
+    try {
+      // First, fetch all rooms
+      const { data: roomsData, error: roomsError } = await supabase
+        .from('rooms')
+        .select('*')
+        .order('block', { ascending: true })
+        .order('room_no', { ascending: true })
+
+      if (roomsError) throw roomsError
+
+      // If no rooms found
+      if (!roomsData || roomsData.length === 0) {
+        setError('no-rooms')
+        return
+      }
+
+      // Then fetch active occupancies separately
+      const { data: occupanciesData, error: occupanciesError } = await supabase
+        .from('occupancies')
+        .select('room_id')
+        .eq('is_active', true)
+
+      if (occupanciesError) {
+        console.error('Error fetching occupancies:', occupanciesError)
+      }
+
+      setRooms(roomsData || [])
+      setOccupancies(occupanciesData || [])
+      setError(null)
+    } catch (err: any) {
+      console.error('Error fetching data:', err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  // If no rooms found
-  if (!rooms || rooms.length === 0) {
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return <div className="text-center py-8">Loading rooms...</div>
+  }
+
+  if (error === 'no-rooms') {
     return (
       <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
         <p className="font-medium">No rooms found in database</p>
@@ -36,14 +69,16 @@ export default async function RoomsBoard() {
     )
   }
 
-  // Then fetch active occupancies separately
-  const { data: occupancies, error: occupanciesError } = await supabase
-    .from('occupancies')
-    .select('room_id')
-    .eq('is_active', true)
-
-  if (occupanciesError) {
-    console.error('Error fetching occupancies:', occupanciesError)
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <p className="font-medium">Error loading rooms data</p>
+        <p className="text-sm mt-1">Details: {error}</p>
+        <p className="text-sm mt-2">
+          Please visit <a href="/setup" className="underline font-medium">Setup Page</a> to initialize the database.
+        </p>
+      </div>
+    )
   }
 
   // Count occupancies per room
@@ -147,11 +182,13 @@ export default async function RoomsBoard() {
                 .map((room: any) => (
                   <RoomCard
                     key={room.id}
+                    roomId={room.id}
                     roomNumber={room.room_number}
                     building={displayName}
                     capacity={room.capacity}
                     occupied={room.occupied}
                     price={room.price}
+                    onCapacityUpdate={fetchData}
                   />
                 ))}
             </div>
