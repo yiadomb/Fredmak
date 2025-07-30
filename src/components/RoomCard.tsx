@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 interface RoomCardProps {
@@ -10,6 +10,11 @@ interface RoomCardProps {
   capacity: number
   occupied: number
   price: number
+  residents?: Array<{
+    id: string
+    full_name: string
+    student_id?: string
+  }>
   onClick?: () => void
   onCapacityUpdate?: () => void
 }
@@ -21,6 +26,7 @@ export default function RoomCard({
   capacity, 
   occupied, 
   price,
+  residents,
   onClick,
   onCapacityUpdate
 }: RoomCardProps) {
@@ -29,6 +35,10 @@ export default function RoomCard({
   const [updating, setUpdating] = useState(false)
   const supabase = createClientComponentClient()
   const isFullyOccupied = occupied === capacity
+  
+  // Triple-click detection
+  const clickCount = useRef(0)
+  const clickTimer = useRef<NodeJS.Timeout | null>(null)
 
   const handleCapacityUpdate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,8 +80,27 @@ export default function RoomCard({
   }
 
   const handleCardClick = (e: React.MouseEvent) => {
-    if (!isEditingCapacity && onClick) {
-      onClick()
+    if (isEditingCapacity) return
+    
+    clickCount.current += 1
+    
+    if (clickCount.current === 3 && roomId) {
+      // Triple click detected - enable editing
+      setIsEditingCapacity(true)
+      setNewCapacity(capacity.toString())
+      clickCount.current = 0
+      if (clickTimer.current) {
+        clearTimeout(clickTimer.current)
+      }
+    } else if (clickCount.current === 1) {
+      // Single click - normal behavior
+      if (onClick) {
+        onClick()
+      }
+      // Reset counter after delay
+      clickTimer.current = setTimeout(() => {
+        clickCount.current = 0
+      }, 500)
     }
   }
 
@@ -82,20 +111,18 @@ export default function RoomCard({
     >
       <div className="flex justify-between items-start mb-3">
         <h3 className="font-semibold text-gray-900 text-lg">{roomNumber}</h3>
-        {roomId && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setIsEditingCapacity(true)
-              setNewCapacity(capacity.toString())
-            }}
-            className="text-xs text-gray-500 hover:text-blue-600"
-            title="Edit capacity"
-          >
-            ✏️
-          </button>
-        )}
       </div>
+      
+      {/* Residents List */}
+      {residents && residents.length > 0 && (
+        <div className="mb-2 space-y-1">
+          {residents.map((resident) => (
+            <div key={resident.id} className="text-xs text-gray-600 truncate">
+              {resident.full_name}
+            </div>
+          ))}
+        </div>
+      )}
       
       {/* Occupancy Indicators - Visual dots */}
       <div className="flex items-center gap-1 mb-2">
@@ -110,8 +137,8 @@ export default function RoomCard({
         ))}
       </div>
       
-      {/* Occupancy Text or Edit Form */}
-      {isEditingCapacity ? (
+      {/* Capacity Edit Form */}
+      {isEditingCapacity && (
         <form onSubmit={handleCapacityUpdate} className="text-sm" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-2">
             <span>{occupied}/</span>
@@ -146,16 +173,6 @@ export default function RoomCard({
             </button>
           </div>
         </form>
-      ) : (
-        occupied > 0 && (
-          <div className="text-sm text-gray-600">
-            {isFullyOccupied ? (
-              <span className="text-green-600 font-medium">Fully Occupied</span>
-            ) : (
-              <span>{occupied}/{capacity} Occupied</span>
-            )}
-          </div>
-        )
       )}
     </div>
   )

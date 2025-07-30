@@ -17,7 +17,10 @@ export default function AddResidentModal({ isOpen, onClose, onSuccess }: AddResi
     email: '',
     student_id: '',
     program: '',
-    level: ''
+    level: '',
+    emergency_contact_name: '',
+    emergency_contact_relationship: '',
+    emergency_contact_phone: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -44,7 +47,10 @@ export default function AddResidentModal({ isOpen, onClose, onSuccess }: AddResi
         email: '',
         student_id: '',
         program: '',
-        level: ''
+        level: '',
+        emergency_contact_name: '',
+        emergency_contact_relationship: '',
+        emergency_contact_phone: ''
       })
       
       onSuccess()
@@ -180,6 +186,52 @@ export default function AddResidentModal({ isOpen, onClose, onSuccess }: AddResi
               <option value="600">600</option>
               <option value="Graduate">Graduate</option>
             </select>
+          </div>
+
+          {/* Emergency Contact Section */}
+          <div className="border-t pt-4 mt-4">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Emergency Contact</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Contact Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.emergency_contact_name}
+                  onChange={(e) => setFormData({ ...formData, emergency_contact_name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Jane Doe"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Relationship
+                </label>
+                <input
+                  type="text"
+                  value={formData.emergency_contact_relationship}
+                  onChange={(e) => setFormData({ ...formData, emergency_contact_relationship: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Parent, Guardian, etc."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Contact Phone
+                </label>
+                <input
+                  type="tel"
+                  value={formData.emergency_contact_phone}
+                  onChange={(e) => setFormData({ ...formData, emergency_contact_phone: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="+233 XX XXX XXXX"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">

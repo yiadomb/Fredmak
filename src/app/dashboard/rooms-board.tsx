@@ -32,7 +32,15 @@ export default function RoomsBoard() {
       // Then fetch active occupancies separately
       const { data: occupanciesData, error: occupanciesError } = await supabase
         .from('occupancies')
-        .select('room_id')
+        .select(`
+          room_id,
+          resident_id,
+          residents (
+            id,
+            full_name,
+            student_id
+          )
+        `)
         .eq('is_active', true)
 
       if (occupanciesError) {
@@ -87,6 +95,17 @@ export default function RoomsBoard() {
     return acc
   }, {}) || {}
 
+  // Group residents by room
+  const residentsByRoom = occupancies?.reduce((acc: any, occ) => {
+    if (!acc[occ.room_id]) {
+      acc[occ.room_id] = []
+    }
+    if (occ.residents) {
+      acc[occ.room_id].push(occ.residents)
+    }
+    return acc
+  }, {}) || {}
+
   // Add occupancy count to rooms and map to expected format
   const roomsWithOccupancy = rooms?.map(room => ({
     ...room,
@@ -95,7 +114,8 @@ export default function RoomsBoard() {
     price: room.type === '1-bed' && room.block === 'Executive' ? 13000 : 
            room.type === '2-bed' && room.block === 'Executive' ? 8000 :
            room.type === '2-bed' && room.block === 'New' ? 7000 : 5500,
-    occupied: occupancyCount[room.id] || 0
+    occupied: occupancyCount[room.id] || 0,
+    residents: residentsByRoom[room.id] || []
   })) || []
 
   // Group rooms by building
@@ -176,6 +196,43 @@ export default function RoomsBoard() {
                     if (aGroup !== bGroup) return aGroup - bGroup
                     return aNum - bNum
                   }
+                  
+                  // Special sorting for New block - T floor before L floor
+                  if (building === 'New') {
+                    // Extract floor letter and room number
+                    const aFloor = a.room_number[1] // 'F', 'S', 'T', or 'L'
+                    const bFloor = b.room_number[1]
+                    const aNum = parseInt(a.room_number.substring(2))
+                    const bNum = parseInt(b.room_number.substring(2))
+                    
+                    // Define floor order: F < S < T < L
+                    const floorOrder: Record<string, number> = { 'F': 0, 'S': 1, 'T': 2, 'L': 3 }
+                    const aFloorOrder = floorOrder[aFloor] ?? 99
+                    const bFloorOrder = floorOrder[bFloor] ?? 99
+                    
+                    // Sort by floor first, then by room number
+                    if (aFloorOrder !== bFloorOrder) return aFloorOrder - bFloorOrder
+                    return aNum - bNum
+                  }
+                  
+                  // Special sorting for Old block - G floor before F floor
+                  if (building === 'Old') {
+                    // Extract floor letter and room number
+                    const aFloor = a.room_number[0] // 'G', 'F', 'S', or 'T'
+                    const bFloor = b.room_number[0]
+                    const aNum = parseInt(a.room_number.substring(1))
+                    const bNum = parseInt(b.room_number.substring(1))
+                    
+                    // Define floor order: G < F < S < T
+                    const floorOrder: Record<string, number> = { 'G': 0, 'F': 1, 'S': 2, 'T': 3 }
+                    const aFloorOrder = floorOrder[aFloor] ?? 99
+                    const bFloorOrder = floorOrder[bFloor] ?? 99
+                    
+                    // Sort by floor first, then by room number
+                    if (aFloorOrder !== bFloorOrder) return aFloorOrder - bFloorOrder
+                    return aNum - bNum
+                  }
+                  
                   // Default sorting for other blocks
                   return a.room_number.localeCompare(b.room_number)
                 })
@@ -188,6 +245,7 @@ export default function RoomsBoard() {
                     capacity={room.capacity}
                     occupied={room.occupied}
                     price={room.price}
+                    residents={room.residents}
                     onCapacityUpdate={fetchData}
                   />
                 ))}
