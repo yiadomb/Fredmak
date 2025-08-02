@@ -1,9 +1,10 @@
-import { Suspense } from 'react'
-import ResidentsList from './residents-list'
-import ResidentsWrapper from './residents-wrapper'
 import Link from 'next/link'
 
-export default function ResidentsPage() {
+export default function FeesLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -20,8 +21,8 @@ export default function ResidentsPage() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">Manager</span>
-              <a
-                href="/"
+              <a 
+                href="/" 
                 className="text-sm text-blue-600 hover:text-blue-800"
               >
                 View Public Site
@@ -39,12 +40,12 @@ export default function ResidentsPage() {
               <Link href="/dashboard" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
                 🏠 Rooms Board
               </Link>
-              <div className="flex items-center px-3 py-2 text-sm font-medium text-gray-900 bg-blue-50 rounded-md border-l-4 border-blue-500">
+              <Link href="/dashboard/residents" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
                 👥 Residents & Occupancies
-              </div>
-              <Link href="/dashboard/fees" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
-                💰 Fees & Payments
               </Link>
+              <div className="flex items-center px-3 py-2 text-sm font-medium text-gray-900 bg-blue-50 rounded-md border-l-4 border-blue-500">
+                💰 Fees & Payments
+              </div>
               <div className="flex items-center px-3 py-2 text-sm font-medium text-gray-400 rounded-md cursor-not-allowed">
                 📝 Applications Review
               </div>
@@ -60,7 +61,7 @@ export default function ResidentsPage() {
 
         {/* Main content */}
         <main className="flex-1 p-6">
-          <ResidentsWrapper />
+          {children}
         </main>
       </div>
     </div>

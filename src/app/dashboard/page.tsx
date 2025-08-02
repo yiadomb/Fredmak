@@ -40,9 +40,9 @@ export default function DashboardPage() {
               <a href="/dashboard/residents" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
                 👥 Residents & Occupancies
               </a>
-              <div className="flex items-center px-3 py-2 text-sm font-medium text-gray-400 rounded-md cursor-not-allowed">
+              <a href="/dashboard/fees" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
                 💰 Fees & Payments
-              </div>
+              </a>
               <div className="flex items-center px-3 py-2 text-sm font-medium text-gray-400 rounded-md cursor-not-allowed">
                 📝 Applications Review
               </div>
