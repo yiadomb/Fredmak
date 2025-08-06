@@ -146,4 +146,122 @@
 - Stage 3: 2 days
 - Stage 4: 2 days
 
-*Ready to begin Stage 1 implementation.* 
+*Ready to begin Stage 1 implementation.*
+
+## Future Enhancements - Multi-Hostel Configuration
+
+### Enhanced Setup Wizard for Different Hostels
+**Goal**: Make the system fully configurable so any hostel manager can adapt it to their specific needs.
+
+The `/setup` page should be enhanced to become a comprehensive configuration wizard that allows:
+
+1. **Hostel Information**
+   - Hostel name and branding
+   - Logo upload
+   - Contact information
+   - Location/address
+
+2. **Building Configuration**
+   - Custom number of buildings
+   - Custom building names (not just Old/New/Executive)
+   - Floors per building
+   - Custom room naming patterns
+
+3. **Room Setup**
+   - Variable room capacities (1-bed, 2-bed, 3-bed, 4-bed, etc.)
+   - Custom room numbers/naming
+   - Room categories/types specific to their hostel
+
+4. **Fee Structure**
+   - Custom fee matrix based on their pricing
+   - Different payment terms (monthly, per semester, annual)
+   - Currency configuration
+   - Discount rules
+
+5. **Academic Calendar**
+   - Custom academic year format
+   - Semester/term configuration
+   - Intake periods
+
+6. **Features Toggle**
+   - Enable/disable modules (e.g., some hostels might not need maintenance tracking)
+   - Custom fields for residents
+   - Additional features based on hostel needs
+
+### Implementation Approach
+- Create a guided setup wizard with steps
+- Store all configuration in `app_settings` table
+- Make the UI dynamically adapt based on configuration
+- Export/import configuration for easy replication
+- Provide preset templates (e.g., "University Hostel", "Private Hostel", "Student Accommodation")
+
+### Benefits
+- One codebase serves multiple hostels
+- Easy deployment for new clients
+- Reduces customization effort
+- Makes the system truly scalable
+
+**Note**: This enhancement would transform the system from a Fredmak-specific solution to a universal hostel management platform.
+
+## Pending Features (To Be Implemented)
+
+### 1. Authentication System
+- **Purpose**: Secure login and role-based access control
+- **Components**:
+  - Login page with email/password authentication
+  - Role management (Manager, Staff, Student)
+  - Protected routes requiring authentication
+  - Session management
+  - Password reset functionality
+- **Technology**: Supabase Auth with Next.js middleware
+
+### 2. Email Integration
+- **Purpose**: Automated communication with students
+- **Key Features**:
+  - Send acceptance/rejection emails when applications are reviewed
+  - Email notifications for payment reminders
+  - Maintenance completion notifications
+  - Bulk email capabilities for announcements
+- **Technology**: Resend API or similar email service
+- **Trigger Points**:
+  - Application status change (Accept/Decline/Wait-list)
+  - Payment due dates
+  - Maintenance issue updates
+
+### 3. Renewal Form
+- **Purpose**: Streamline the process for returning residents
+- **Features**:
+  - Pre-filled form with existing resident data
+  - Room preference retention option
+  - Simplified approval process
+  - Academic year rollover integration
+- **Workflow**:
+  - Email sent to current residents before semester end
+  - One-click renewal with payment
+  - Automatic room assignment for approved renewals
+
+### 4. Academic Year Rollover
+- **Purpose**: Transition between academic years
+- **Functions**:
+  - Archive previous year's data
+  - Clear room assignments (optional)
+  - Reset payment records
+  - Generate year-end reports
+  - Bulk graduate residents
+  - Prepare system for new intake
+- **Safeguards**:
+  - Backup before rollover
+  - Preview changes before confirmation
+  - Rollback capability
+
+### 5. Additional Enhancements (Future)
+- **Reports & Analytics**:
+  - Occupancy trends
+  - Revenue reports
+  - Maintenance statistics
+  - Student demographics
+- **Mobile App**: Native mobile application for residents
+- **Payment Gateway**: Online payment integration
+- **Document Management**: Store and manage resident documents
+- **Visitor Management**: Track and manage hostel visitors
+- **Inventory Management**: Track hostel assets and supplies 

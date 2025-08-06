@@ -45,15 +45,18 @@ export default function ResidentsPage() {
               <Link href="/dashboard/fees" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
                 💰 Fees & Payments
               </Link>
-              <div className="flex items-center px-3 py-2 text-sm font-medium text-gray-400 rounded-md cursor-not-allowed">
+              <Link href="/dashboard/applications" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
                 📝 Applications Review
-              </div>
-              <div className="flex items-center px-3 py-2 text-sm font-medium text-gray-400 rounded-md cursor-not-allowed">
+              </Link>
+              <Link href="/dashboard/maintenance" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
                 🔧 Maintenance
-              </div>
-              <div className="flex items-center px-3 py-2 text-sm font-medium text-gray-400 rounded-md cursor-not-allowed">
+              </Link>
+              <Link href="/dashboard/media" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
+                🖼️ Media Gallery
+              </Link>
+              <Link href="/dashboard/settings" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50">
                 ⚙️ Settings
-              </div>
+              </Link>
             </div>
           </div>
         </nav>
